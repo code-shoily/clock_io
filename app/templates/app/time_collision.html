@@ -1,0 +1,19 @@
+{% extends 'layouts/app_base.html' %}
+
+{% block content %}
+  <div class="uk-width-1-1">
+    <div class="uk-card uk-card-secondary uk-card-body">
+      <div class="uk-card-title">
+        <h3>Time collision!!!</h3>
+      </div>
+      <div>
+        There was a collision in the times you have selected. You may have an active check-in,
+        or there exists another event that overlaps with the time you have selected. Please ensure
+        you have no time clashes in events.
+      </div>
+      <div class="uk-margin-top">
+        <a href="{% url 'app:list-event' %}" class="uk-button uk-button-primary">Back to Events</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

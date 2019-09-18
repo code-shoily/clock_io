@@ -1,0 +1,20 @@
+{% extends "layouts/base.html" %}
+{% block body %}
+  <nav class="uk-navbar-container uk-navbar-secondary uk-margin" uk-navbar="mode: click">
+    <div class="uk-navbar-right">
+      <ul class="uk-navbar-nav">
+        <li><a href="{% url 'logout' %}"><span uk-icon="icon: sign-out"></span> Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+  <div class="uk-container">
+    <div class="uk-grid-small" uk-grid>
+      <div class="uk-width-1-4">
+        {% block left_card %}
+        {% endblock %}
+      </div>
+      {% block content %}
+      {% endblock %}
+    </div>
+  </div>
+{% endblock %}

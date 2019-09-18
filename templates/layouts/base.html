@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.2.0/css/uikit.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <style>
+    html {
+      background: #ecf0f1;
+    }
+
+    .form-error {
+      margin-top: 5px;
+    }
+  </style>
+  {% block extracss %}{% endblock %}
+</head>
+<body>
+{% block body %}{% endblock %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.2.0/js/uikit.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.2.0/js/uikit-icons.min.js"></script>
+<script
+    src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+{% block extrajs %}{% endblock %}{% if messages %}
+  <script>
+    {% for message in messages %}
+      UIkit.notification({
+        message: '<span uk-icon=\'icon: check\'></span> {{ message }}',
+        status: 'success',
+        pos: 'top-center',
+        timeout: 2000
+      });
+    {% endfor %}
+  </script>
+{% endif %}
+
+</body>
+</html>

@@ -1,0 +1,116 @@
+{% extends 'layouts/app_base.html' %}
+{% load widget_tweaks %}
+
+{% block left_card %}
+  <div class="uk-card uk-card-small uk-card-secondary uk-card-body">
+    <h5>Tips</h5>
+    <div>
+      <ul>
+        <li>Overlapping attendances are invalid</li>
+        <li>If you are adding a checkin of a previous date, then you must also add end time</li>
+        <li>Checkins/Checkouts cannot span days</li>
+        <li>End time can be empty, but only if it is on the same day and there are no overlaps. Use the checkin button
+          on home page instead</li>
+      </ul>
+    </div>
+    <div class="uk-margin-top">
+      <a href="{% url 'app:list-event' %}" class="uk-button uk-button-primary uk-button-small uk-width-1-1">
+        <span uk-icon="icon: arrow-left"></span> Back to event list
+      </a>
+    </div>
+  </div>
+{% endblock %}
+
+{% block content %}
+  <div class="uk-width-1-2">
+    <div class="uk-card uk-card-default uk-card-body">
+      <div class="uk-card-title">
+        <h3>New Check In</h3>
+      </div>
+      <form method="POST" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="uk-background-muted uk-panel">
+            {% for non_field_error in form.non_field_errors %}
+              <div class="uk-text-danger">{{ non_field_error }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+        {% with WIDGET_ERROR_CLASS='uk-form-danger' %}
+          <div class="uk-margin">
+            <div class="uk-form-controls">
+              <div class="uk-inline uk-width-1-1">
+                <span class="uk-form-icon" uk-icon="icon: calendar"></span>
+                {% render_field form.date class="uk-input date-input" placeholder="Date" %}
+              </div>
+              {% for error in form.date.errors %}
+                <div class="uk-text-danger form-error">{{ error }}</div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="uk-margin">
+            <div class="uk-form-controls">
+              <div class="uk-inline uk-width-1-1">
+                <span class="uk-form-icon" uk-icon="icon: history"></span>
+                {% render_field form.time_from class="uk-input time-input" placeholder="From (Time)" %}
+              </div>
+              {% for error in form.time_from.errors %}
+                <div class="uk-text-danger form-error">{{ error }}</div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="uk-margin">
+            <div class="uk-form-controls">
+              <div class="uk-inline uk-width-1-1">
+                <span class="uk-form-icon" uk-icon="icon: future"></span>
+                {% render_field form.time_to class="uk-input time-input" placeholder="To (Time)" %}
+              </div>
+              {% for error in form.time_to.errors %}
+                <div class="uk-text-danger form-error">{{ error }}</div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="uk-margin">
+            <div class="uk-form-controls">
+              <div class="uk-inline uk-width-1-1">
+                <span class="uk-form-icon" uk-icon="icon: list"></span>
+                {% render_field form.remarks class="uk-input time-input" placeholder="Remarks" %}
+              </div>
+              {% for error in form.remarks.errors %}
+                <div class="uk-text-danger form-error">{{ error }}</div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endwith %}
+        <button class="uk-button uk-button-primary uk-margin-small-bottom" type="submit">
+          <span class="uk-icon" uk-icon="icon: plus"></span> Create
+        </button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extrajs %}
+  <script>
+    $('.date-input').flatpickr({
+      {% if not object.id %}defaultDate: "today",{% endif %}
+      maxDate: "today"
+    });
+    $('#id_time_from').flatpickr({
+      enableTime: true,
+      noCalendar: true,
+      dateFormat: "H:i",
+      {% if not object.id %}defaultDate: "08:00",{% endif %}
+      time_24hr: true
+    })
+    $('#id_time_to').flatpickr({
+      enableTime: true,
+      noCalendar: true,
+      dateFormat: "H:i",
+      time_24hr: true
+    })
+  </script>
+{% endblock %}

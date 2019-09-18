@@ -1,0 +1,166 @@
+{% extends "layouts/app_base.html" %}
+{% block left_card %}
+  <div class="uk-card uk-card-small uk-card-secondary uk-card-body">
+    <h5>HELLO, {{ user.get_full_name }}</h5>
+    <div>
+      You last {% if last_data.is_current %}checked-in{% else %}checked-out{% endif %} at
+      {% if last_data.is_current %}{{ last_data.start_time }}{% else %}{{ last_data.end_time }}{% endif %}
+    </div>
+    <div class="uk-margin-top">
+      {% if last_data.is_current %}
+        <form action="{% url 'app:checkout-event' last_data.id %}" method="POST">
+          {% csrf_token %}
+          <button type="submit" class="uk-button uk-button-danger uk-button-small uk-width-1-1">
+            <span uk-icon="icon: arrow-left"></span> Check Out
+          </button>
+        </form>
+      {% else %}
+        <form action="{% url 'app:checkin-event' %}" method="POST">
+          {% csrf_token %}
+          <button type="submit" class="uk-button uk-button-primary uk-button-small uk-width-1-1">
+            <span uk-icon="icon: arrow-right"></span> Check In
+          </button>
+        </form>
+      {% endif %}
+    </div>
+    <div class="uk-margin-top">
+      <a href="{% url 'app:create-event' %}" class="uk-button uk-button-primary uk-button-small uk-width-1-1">
+        <span uk-icon="icon: plus"></span> Add Past Log
+      </a>
+    </div>
+  </div>
+{% endblock %}
+{% block content %}
+  <div class="uk-width-3-4">
+    <div class="uk-card uk-card-default uk-card-body">
+      <div class="uk-card-title">
+        <h3>Event List</h3>
+      </div>
+      <table class="uk-table uk-table-divider uk-table-striped">
+        <caption class="uk-margin-bottom">
+          <div class="uk-text-right">
+            <form action="." method="GET">
+              <input class="uk-input uk-form-small uk-width-medium date" name="date_range" placeholder="Date Range"/>
+              <button class="uk-button uk-button-small uk-button-primary"><span uk-icon="icon: search"></span></button>
+              <a href="{% url 'app:list-event' %}" class="uk-button uk-button-small uk-button-secondary"><span
+                  uk-icon="icon: refresh"></span></a>
+            </form>
+          </div>
+        </caption>
+        <thead>
+        <tr>
+          <th><a class="order-by-column uk-link-text" data-column="start_time" href="#">Start</a></th>
+          <th><a class="order-by-column uk-link-text" data-column="end_time" href="#">End</a></th>
+          <th><a class="order-by-column uk-link-text" data-column="duration" href="#">Duration</a></th>
+          <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for event in object_list %}
+          <tr>
+            <td>{{ event.start_time }}</td>
+            <td>
+              {% if event.end_time %}
+                {{ event.end_time }}
+              {% else %}
+                Active
+              {% endif %}
+            </td>
+            <td>{{ event.duration }}</td>
+            <td>
+              <a href="{% url 'app:update-event' event.id %}" class="uk-button uk-button-primary uk-button-small"><span
+                  uk-icon="icon: pencil"></span></a>
+              <a href="{% url 'app:delete-event' event.id %}" class="uk-button uk-button-danger uk-button-small"><span
+                  uk-icon="icon: trash"></span></a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4">
+              <div class="uk-padding-small uk-text-center">
+                There is no data. <a href="{% url 'app:create-event' %}" class="uk-link-text">Add one?</a>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% if is_paginated %}
+        <ul class="uk-pagination uk-flex-center">
+          {% if page_obj.has_previous %}
+            <li>
+              <a href="{% url 'app:list-event' %}?page={{ page_obj.previous_page_number }}">
+                <span class="uk-margin-small-right" uk-pagination-previous></span> Previous
+              </a>
+            </li>
+          {% endif %}
+          {% if page_obj.has_next %}
+            <li>
+              <a href="{% url 'app:list-event' %}?page={{ page_obj.next_page_number }}">
+                Next <span class="uk-margin-small-left" uk-pagination-next></span>
+              </a>
+            </li>
+          {% endif %}
+
+        </ul>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block extrajs %}
+  <script>
+    function setupOrderedColumns(order_by, ordering) {
+
+      $('.order-by-column').each(function () {
+
+        var $el = $(this),
+          column_name = $el.data('column'),
+          href = location.href,
+          next_order = 'asc',
+          has_query_string = (href.indexOf('?') !== -1),
+          order_by_param,
+          ordering_param;
+
+        if (order_by === column_name) {
+          $el.addClass('current');
+          $el.addClass(ordering);
+          $el.append('<span class="caret"></span>');
+          if (ordering === 'asc') {
+            $el.addClass('dropup');
+            next_order = 'desc';
+          }
+        }
+
+        order_by_param = "order_by=" + column_name;
+        ordering_param = "ordering=" + next_order;
+
+        if (!has_query_string) {
+          href = '?' + order_by_param + '&' + ordering_param;
+        } else {
+          if (href.match(/ordering=(asc|desc)/)) {
+            href = href.replace(/ordering=(asc|desc)/, ordering_param);
+          } else {
+            href += '&' + ordering_param;
+          }
+
+          if (href.match(/order_by=[_\w]+/)) {
+            href = href.replace(/order_by=([_\w]+)/, order_by_param);
+          } else {
+            href += '&' + order_by_param;
+          }
+
+        }
+
+        $el.attr('href', href);
+
+      });
+    }
+
+    setupOrderedColumns('{{ order_by }}', '{{ ordering }}');
+
+    $('.date').flatpickr({
+      mode: "range"
+    })
+  </script>
+{% endblock %}

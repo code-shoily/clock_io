@@ -1,0 +1,23 @@
+{% extends 'layouts/app_base.html' %}
+
+{% block content %}
+  <div class="uk-width-1-1">
+    <div class="uk-card uk-card-default uk-card-body">
+      <div class="uk-card-title">
+        Confirm Deletion
+      </div>
+      <form method="POST">
+        {% csrf_token %}
+        Are you sure you want to delete {{ object }}
+        <div class="uk-margin-top">
+          <button type="submit" class="uk-button uk-button-danger">
+            Sure, delete
+          </button>
+          <a href="{% url 'app:list-event' %}" class="uk-button uk-button-secondary">
+            No, take me back
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
